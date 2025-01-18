@@ -127,6 +127,7 @@ aggregate_and_report_job:
 
 - **JUnit XML Reports**: Enables the GitLab test summary widget.
 - **Aggregated Reports**: Combines batch job outputs into a single HTML and XML report for clarity.
+![image](https://github.com/user-attachments/assets/fca02cba-2b52-4625-a1a3-e4ad27496d28)
 
 ### **Benefits**
 - **Persistent Reports**: Test results remain accessible even if new changes overwrite the pipeline’s test summary.
