@@ -123,6 +123,8 @@ aggregate_and_report_job:
 
 ### **Outputs**
 - **HTML Reports**: Detailed test results are stored as artifacts and accessible via the GitLab pipeline UI.
+  ![image](https://github.com/user-attachments/assets/2eb16065-842a-44e6-be79-a78dea12b52c)
+
 - **JUnit XML Reports**: Enables the GitLab test summary widget.
 - **Aggregated Reports**: Combines batch job outputs into a single HTML and XML report for clarity.
 
