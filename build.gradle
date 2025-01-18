@@ -1,0 +1,59 @@
+plugins {
+	id 'java'
+	id 'eclipse' // optional (to generate Eclipse project files)
+	id 'idea' // optional (to generate IntelliJ IDEA project files)
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	testImplementation(platform('org.junit:junit-bom:5.11.4'))
+	testImplementation('org.junit.jupiter:junit-jupiter')
+	testRuntimeOnly('org.junit.platform:junit-platform-launcher')
+}
+
+test {
+    // Always generate test reports even on failures
+    reports {
+        html.required = true
+        junitXml.required = true
+    }
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
+}
+task test1(type: Test) {
+    // Always generate test reports even on failures
+    reports {
+        html.required = true
+        junitXml.required = true
+    }
+
+    useJUnitPlatform()
+    reports {
+        html.destination file("build/reports/tests/test-1")
+    }
+        testLogging {
+                events "passed", "skipped", "failed"
+        }
+
+}
+
+task test2(type: Test) {
+    // Always generate test reports even on failures
+    reports {
+        html.required = true
+        junitXml.required = true
+    }
+    useJUnitPlatform()
+    reports {
+        html.destination file("build/reports/tests/test-2")
+    }
+        testLogging {
+                events "passed", "skipped", "failed"
+        }
+
+}
