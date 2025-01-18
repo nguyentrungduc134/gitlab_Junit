@@ -1,0 +1,72 @@
+stages:
+  - build
+  - test
+  - report
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs='-Xms512m -Xmx1024m'"
+
+default:
+  tags:
+    - ns2
+  image: gradle:7.6-jdk11
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+before_script:
+  - echo "Using GitLab Runner with tag 'ns2'"
+  - chmod +x gradlew
+
+build_job:
+  stage: build
+  script:
+    - ./gradlew clean build
+  artifacts:
+    paths:
+      - build/libs/
+    expire_in: 14 days
+
+test_job_1:
+  stage: test
+  script:
+    - ./gradlew test1 --tests "com.example.project.CalculatorTests.addsTwoNumbers"  # Run specific test case
+  artifacts:
+    when: always
+    paths:
+      - build/reports/tests/test-1/index.html  # Separate directory for Job 1
+      - build/test-results/test1/TEST-*.xml  # JUnit XML for GitLab's test summary
+    reports:
+      junit: build/test-results/test1/TEST-*.xml
+    expire_in: 14 days
+
+test_job_2:
+  stage: test
+  script:
+    - ./gradlew test2  --tests "com.example.project.CalculatorTests.add" # Run the custom test2 task
+  artifacts:
+    when: always
+    paths:
+      - build/reports/tests/test-2/index.html  # Separate directory for Job 2
+      - build/test-results/test2/TEST-*.xml  # JUnit XML for GitLab's test summary
+    reports:
+      junit: build/test-results/test2/TEST-*.xml
+    expire_in: 14 days
+aggregate_and_report_job:
+  stage: report
+  image: python:3.9
+  script:
+    - echo "Aggregating reports from batch jobs..."
+    - mkdir -p build/reports/aggregate
+    - python3 combine_junit_reports.py  # Combine XML reports
+    - cat build/reports/tests/test-1/index.html build/reports/tests/test-2/index.html > build/reports/aggregate/combined_report.html
+    - echo "HTML and JUnit reports aggregated successfully."
+  artifacts:
+    when: always
+    paths:
+      - build/reports/aggregate/combined_report.html
+      - build/reports/aggregate/combined.xml
+    reports:
+      junit: build/reports/aggregate/combined.xml
+    expire_in: 14 days
