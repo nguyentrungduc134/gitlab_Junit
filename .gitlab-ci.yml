@@ -10,6 +10,7 @@ default:
   tags:
     - ns2
   image: gradle:7.6-jdk11
+
 cache:
   paths:
     - .gradle/wrapper
@@ -31,12 +32,12 @@ build_job:
 test_job_1:
   stage: test
   script:
-    - ./gradlew test1 --tests "com.example.project.CalculatorTests.addsTwoNumbers"  # Run specific test case
+    - ./gradlew test1 --tests "com.example.project.CalculatorTests.addsTwoNumbers"
   artifacts:
     when: always
     paths:
-      - build/reports/tests/test-1/index.html  # Separate directory for Job 1
-      - build/test-results/test1/TEST-*.xml  # JUnit XML for GitLab's test summary
+      - build/reports/tests/test-1/index.html
+      - build/test-results/test1/TEST-*.xml
     reports:
       junit: build/test-results/test1/TEST-*.xml
     expire_in: 14 days
@@ -44,23 +45,26 @@ test_job_1:
 test_job_2:
   stage: test
   script:
-    - ./gradlew test2  --tests "com.example.project.CalculatorTests.add" # Run the custom test2 task
+    - ./gradlew test2 --tests "com.example.project.CalculatorTests.add"
   artifacts:
     when: always
     paths:
-      - build/reports/tests/test-2/index.html  # Separate directory for Job 2
-      - build/test-results/test2/TEST-*.xml  # JUnit XML for GitLab's test summary
+      - build/reports/tests/test-2/index.html
+      - build/test-results/test2/TEST-*.xml
     reports:
       junit: build/test-results/test2/TEST-*.xml
     expire_in: 14 days
+
 aggregate_and_report_job:
   stage: report
   image: python:3.9
+  before_script:
+    - pip install junit2html
   script:
     - echo "Aggregating reports from batch jobs..."
     - mkdir -p build/reports/aggregate
     - python3 combine_junit_reports.py  # Combine XML reports
-    - cat build/reports/tests/test-1/index.html build/reports/tests/test-2/index.html > build/reports/aggregate/combined_report.html
+    - junit2html build/reports/aggregate/combined.xml build/reports/aggregate/combined_report.html
     - echo "HTML and JUnit reports aggregated successfully."
   artifacts:
     when: always
